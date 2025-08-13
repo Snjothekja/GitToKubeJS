@@ -17,16 +17,28 @@ import java.util.zip.ZipInputStream;
 
 public class Gittokubejs implements ModInitializer {
 
+    public static Path githubLinkFile;
     @Override
     public void onInitialize() {
 
         //Path modConfigFolder = Paths.get("../config/gittokubejs");
-        Path modConfigFolder = Paths.get("../git2kubejs");
+        Path modConfigFolder = Paths.get("../config/git2kubejs");
         if(Files.notExists(modConfigFolder)) {
             try {
                 Files.createDirectory(modConfigFolder);
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+        }
+        else {
+            githubLinkFile = Paths.get(modConfigFolder.toString() + "/githublink.txt");
+            if(Files.notExists(githubLinkFile)) {
+                try {
+                    Files.createFile(githubLinkFile);
+                    return;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
@@ -38,6 +50,7 @@ public class Gittokubejs implements ModInitializer {
         }
     }
 
+    /* ||DEPRECATED||
     public static void GetAllFiles() throws IOException {
 
         URL allFiles = new URL("https://raw.githubusercontent.com/Snjothekja/GitToKubeJS/refs/heads/main/testFile.txt");
@@ -52,9 +65,9 @@ public class Gittokubejs implements ModInitializer {
             String[] curFile = s.split(" ");
             System.out.println(curFile[0] + "+" +  curFile[1]);
         }
-
-
     }
+
+     */
 
     public static void Download(URL curFileURl, String directory) throws IOException {
         try {
@@ -72,10 +85,17 @@ public class Gittokubejs implements ModInitializer {
     }
 
     public static void ZipDownloader() throws IOException, URISyntaxException {
-        URL zipFileURL = new URL("https://github.com/Snjothekja/GitToKubeJS/archive/refs/heads/master.zip");
-        Download(zipFileURL, "../KubeJSFilesAndDirectories.zip");
+        //URL zipFileURL = new URL("https://github.com/Snjothekja/GitToKubeJS/archive/refs/heads/master.zip");
+        String link;
+        try {
+            link = new String(Files.readAllBytes(githubLinkFile));
+        } catch (Exception e) {
+            return;
+        }
+        URL zipFileURL = new URL(link);
+        Download(zipFileURL, "../config/git2kubejs/KubeJSFilesAndDirectories.zip");
 
-        ExtractZip("../KubeJSFilesAndDirectories.zip");
+        ExtractZip("../config/git2kubejs/KubeJSFilesAndDirectories.zip");
 
         //Files.deleteIfExists(Paths.get("../KubeJSFilesAndDirectories.zip"));
     }
@@ -83,7 +103,7 @@ public class Gittokubejs implements ModInitializer {
     public static void ExtractZip(String zipFile) throws IOException {
 
         byte[] buffer = new byte[1024];
-        File destDir = new File("../../kubejs");
+        File destDir = new File("../kubejs");
         ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
         ZipEntry ze = zis.getNextEntry();
         while (ze != null) {

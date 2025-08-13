@@ -1,6 +1,7 @@
 package dev.sjnothekja.gittokubejs;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -15,11 +16,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-public class Gittokubejs implements ModInitializer {
+public class Gittokubejs implements PreLaunchEntrypoint {
 
     public static Path githubLinkFile;
+
     @Override
-    public void onInitialize() {
+    public void onPreLaunch() {
+        main();
+    }
+
+    public void main() {
 
         //Path modConfigFolder = Paths.get("../config/gittokubejs");
 
@@ -137,4 +143,6 @@ public class Gittokubejs implements ModInitializer {
         }
         zis.close();
     }
+
+
 }

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "gittokubejs",
+  "version": "${version}",
+  "name": "GitToKubeJS",
+  "description": "A Git downloader for KubeJS resources",
+  "authors": [],
+  "contact": {},
+  "license": "Apache-2.0",
+  "icon": "assets/gittokubejs/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "dev.sjnothekja.gittokubejs.client.GittokubejsDataGenerator"
+    ],
+    "client": [
+      "dev.sjnothekja.gittokubejs.client.GittokubejsClient"
+    ],
+    "main": [
+      "dev.sjnothekja.gittokubejs.Gittokubejs"
+    ]
+  },
+  "mixins": [
+    "gittokubejs.mixins.json",
+    {
+      "config": "gittokubejs.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

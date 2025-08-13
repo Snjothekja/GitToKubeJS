@@ -22,32 +22,30 @@ public class Gittokubejs implements ModInitializer {
     public void onInitialize() {
 
         //Path modConfigFolder = Paths.get("../config/gittokubejs");
-        Path modConfigFolder = Paths.get("../config/git2kubejs");
-        if(Files.notExists(modConfigFolder)) {
-            try {
-                Files.createDirectory(modConfigFolder);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            githubLinkFile = Paths.get(modConfigFolder.toString() + "/githublink.txt");
-            if(Files.notExists(githubLinkFile)) {
-                try {
-                    Files.createFile(githubLinkFile);
-                    return;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
 
+        File configFolder = new File("config");
+        File gittokubeFolder = new File("config/gittokubejs");
+        File configFile = new File("config/gittokubejs/config.txt");
+        try {
+            configFolder.mkdir();
+        }
+        catch (Exception ignored) {}
+        try {
+            gittokubeFolder.mkdir();
+        }
+        catch (Exception ignored) {}
+        try {
+            configFile.createNewFile();
+        } catch (IOException ignored) {}
+        //System.out.println("Config file created or found");
         try {
             //GetAllFiles();
+            githubLinkFile = Path.of("config/gittokubejs/config.txt");
             ZipDownloader();
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     /* ||DEPRECATED||
@@ -88,14 +86,21 @@ public class Gittokubejs implements ModInitializer {
         //URL zipFileURL = new URL("https://github.com/Snjothekja/GitToKubeJS/archive/refs/heads/master.zip");
         String link;
         try {
-            link = new String(Files.readAllBytes(githubLinkFile));
+            //System.out.println("Getting link from: " + githubLinkFile.toString());
+            link = Files.readString(githubLinkFile);
+            //System.out.println("Got this link: " + link);
         } catch (Exception e) {
             return;
         }
+        if(link.isEmpty()){
+            System.out.println("No link");
+            return;
+        }
         URL zipFileURL = new URL(link);
-        Download(zipFileURL, "../config/git2kubejs/KubeJSFilesAndDirectories.zip");
+        //System.out.println("Zip Downloading from: " + link);
+        Download(zipFileURL, "config/gittokubejs/KubeJSFilesAndDirectories.zip");
 
-        ExtractZip("../config/git2kubejs/KubeJSFilesAndDirectories.zip");
+        ExtractZip("config/gittokubejs/KubeJSFilesAndDirectories.zip");
 
         //Files.deleteIfExists(Paths.get("../KubeJSFilesAndDirectories.zip"));
     }
@@ -103,20 +108,23 @@ public class Gittokubejs implements ModInitializer {
     public static void ExtractZip(String zipFile) throws IOException {
 
         byte[] buffer = new byte[1024];
-        File destDir = new File("../kubejs");
+        File destDir = new File("");
         ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
         ZipEntry ze = zis.getNextEntry();
         while (ze != null) {
-            File newFile = newFile(destDir, ze);
-            if(ze.isDirectory()) {
-                if(!newFile.isDirectory() && !newFile.mkdirs()) {
-                    throw new IOException("Could not create directory " + newFile.getAbsolutePath());
-                }
+            File newFile;
+            if (ze.isDirectory() && ze.toString().contains("main")) {
+                newFile = new File(destDir, ze.getName());
+                ze = zis.getNextEntry();
+            }
+            newFile = new File(destDir, System.getProperty("user.dir").substring(3) + "/kubejs/" + ze.getName().substring(ze.getName().indexOf("main") + 4));
+            //System.out.println("System Path: " + System.getProperty("user.dir").substring(3));
+            //System.out.println("Extracting " + ze.getName() + " to " + newFile.getAbsolutePath());
+            if (ze.isDirectory()) {
+                if (!newFile.isDirectory() && !newFile.mkdirs()) {}
             } else {
                 File parent = newFile.getParentFile();
-                if (!parent.isDirectory() && !parent.mkdirs()) {
-                    throw new IOException("Could not create directory " + parent.getAbsolutePath());
-                }
+                if (!parent.isDirectory() && !parent.mkdirs()) {}
 
                 FileOutputStream fos = new FileOutputStream(newFile);
                 int len;
@@ -127,18 +135,6 @@ public class Gittokubejs implements ModInitializer {
             }
             ze = zis.getNextEntry();
         }
-    }
-
-    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
+        zis.close();
     }
 }

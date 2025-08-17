@@ -13,10 +13,7 @@
     "fabric-datagen": [
       "dev.sjnothekja.gittokubejs.client.GittokubejsDataGenerator"
     ],
-    "client": [
-      "dev.sjnothekja.gittokubejs.client.GittokubejsClient"
-    ],
-    "main": [
+    "preLaunch": [
       "dev.sjnothekja.gittokubejs.Gittokubejs"
     ]
   },

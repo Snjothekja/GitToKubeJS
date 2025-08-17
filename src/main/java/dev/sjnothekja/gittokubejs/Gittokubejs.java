@@ -1,6 +1,5 @@
 package dev.sjnothekja.gittokubejs;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
 import java.io.*;
@@ -10,10 +9,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class Gittokubejs implements PreLaunchEntrypoint {
@@ -22,13 +18,13 @@ public class Gittokubejs implements PreLaunchEntrypoint {
 
     @Override
     public void onPreLaunch() {
-        main();
+        config();
     }
 
-    public void main() {
+    public static void config() {
 
         //Path modConfigFolder = Paths.get("../config/gittokubejs");
-
+        System.out.println("Starting GitToKubeonPreJs");
         File configFolder = new File("config");
         File gittokubeFolder = new File("config/gittokubejs");
         File configFile = new File("config/gittokubejs/config.txt");
